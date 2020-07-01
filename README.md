@@ -4,7 +4,7 @@ The `scautoloc` module of SeisComP requires a grid file specifying the minimum n
 This grid file allows precise tuning of the possible event origins, and false alarm reduction, by specifying a conservative distance computed for each grid point, considering a given minimum number of station.
 See https://docs.gempa.de/seiscomp3/current/apps/scautoloc.html#grid-file
 
-`./grid4autoloc` considers every station with a pick as active stations (a logic to be refined in future), and compute the distance to twice the number of required stations as the radius from each grid point.
+`./grid4autoloc` considers every station with a pick in the last 9 days as active stations (a logic to be refined in future), and compute the distance to twice the number of required stations as the radius from each grid point.
 A custom query is used to find active stations, the `scquery` module should be configured with at least basic database access.
 The station locations are taken via the `fdsnws` SeisComP module which should be running.
 The default number of required stations is 4 (i.e. distances thresholds are computed for 8 stations with default safety ratio of 2).
