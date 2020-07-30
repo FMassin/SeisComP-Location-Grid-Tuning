@@ -1,4 +1,5 @@
-# grid4scautoloc
+# SeisComP Location Grid Tuning
+![SeisComP Location Grid Tuning for Scautoloc in Costa Rica showing increasing distance threshold with increase disctance to the seismic network](example.png)
 ## What?
 The `scautoloc` module of SeisComP requires a grid file specifying the minimum number of station and within a given distance radius of each specified point where to start locating an event.
 This grid file allows precise tuning of the possible event origins, and false alarm reduction, by specifying a conservative distance computed for each grid point, considering a given minimum number of station.
