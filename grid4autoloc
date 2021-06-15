@@ -6,6 +6,9 @@ GRID=$2          # e.g. "$SEISCOMP_ROOT/share/scautoloc/grid.conf"
 # Author of pick to search active stations
 AUTHOR=$1        # "scvspick@sc-eew-1"
 
+# database connection parameter
+DATABASE="localhost/seiscomp3"
+
 NLASTDAYS=9      # numbers of days to look back for active station search
 MINPICK=1        # min number of picks for active station search
 
@@ -22,7 +25,7 @@ stationlocation () {
 }
 
 activestations () {
-	scquery -Q "SELECT waveformID_networkCode AS Network, waveformID_stationCode AS Station, COUNT(_oid) AS Picks, MIN(time_value) AS Start, MAX(time_value) AS End FROM Pick WHERE time_value >= '"$(date --date="9 day ago" "+%Y-%m-%d")"' AND time_value <= '2030-06-30' AND creationInfo_author like '$AUTHOR' GROUP BY waveformID_networkCode, waveformID_stationCode;"
+	scquery -Q "SELECT waveformID_networkCode AS Network, waveformID_stationCode AS Station, COUNT(_oid) AS Picks, MIN(time_value) AS Start, MAX(time_value) AS End FROM Pick WHERE time_value >= '"$(date --date="9 day ago" "+%Y-%m-%d")"' AND time_value <= '2030-06-30' AND creationInfo_author like '$AUTHOR' GROUP BY waveformID_networkCode, waveformID_stationCode;" -d $DATABASE
 }
 
 activestationslocations () {
