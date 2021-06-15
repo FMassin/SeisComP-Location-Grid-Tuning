@@ -18,7 +18,9 @@ TELEDIST=3       # central angle threshold to switch to teleseismic case
 TELERANK=9       # scautoloc threshold stations number within radius around each grid point in teleseismic case
 
 # Temporary file to store active station locations 
-STATIONLOCATIONFILE="/tmp/stations"
+STATIONLOCATIONFILE="stations/"$AUTHOR"/"$(date "+%Y-%m-%d")
+
+mkdir -p $(dirname $STATIONLOCATIONFILE)
 
 stationlocation () {
 	curl -s "http://localhost:8080/fdsnws/station/1/query?level=station&format=text&network=$1&station=$2&endafter=$3&startbefore=$4"
