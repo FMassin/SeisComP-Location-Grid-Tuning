@@ -14,16 +14,16 @@ MINPICK=1        # min number of picks for active station search
 
 NSTATMINGRID=4   # scautoloc threshold stations number within radius around each grid point
 SAFETYRATIO=2    # the actual number of active stations used to compute radius around each grid point is $SAFETYRATIO*$NSTATMINGRID 
-TELEDIST=3       # central angle threshold to switch to teleseismic case
-TELERANK=9       # scautoloc threshold stations number within radius around each grid point in teleseismic case
+TELEDIST=4       # central angle threshold to switch to teleseismic case
+TELERANK=6       # scautoloc threshold stations number within radius around each grid point in teleseismic case
 
 # Temporary file to store active station locations 
 STATIONLOCATIONFILE="stations/"$AUTHOR"/"$(date "+%Y-%m-%d")
-
+DENSEGRIDFILE="stations/"$AUTHOR"/"$(date "+%Y-%m-%d").grid
 mkdir -p $(dirname $STATIONLOCATIONFILE)
 
 stationlocation () {
-	curl -s "http://localhost:8080/fdsnws/station/1/query?level=station&format=text&network=$1&station=$2&endafter=$3&startbefore=$4"
+	curl -s "http://localhost:8081/fdsnws/station/1/query?level=station&format=text&network=$1&station=$2&endafter=$3&startbefore=$4"
 }
 
 activestations () {
@@ -43,7 +43,15 @@ activestationslocations () {
 
 activestationslocations > $STATIONLOCATIONFILE
 
+awk '{print $3}' $GRID|sort -u|while read D
+do 
+	( awk -F'|' '{print $4,$3}' $STATIONLOCATIONFILE ; awk '$3~/'$D'/{print $2,$1}' $GRID |sort -u ) | gmt sphtriangulate -Qv | awk '$1!~/>/&&$1!~/#/{print $2,$1,"'$D' 4.0 180 8"}' 
+done | sort -u | sort -n -k3 > ${DENSEGRIDFILE}
+
+
 nthhaversine () {
+	INCLUDETELE=$2
+	TMPGRID=$1
 	python -c 'from math import radians, atan2, degrees, cos, sin, asin, sqrt
 from numpy import sort, around
 stations=[]
@@ -51,7 +59,7 @@ with open("'$STATIONLOCATIONFILE'") as f:
 	for line in f: 
 		stations+=[map(radians,map(float,line.split("|")[2:4]))]
 grid=[]
-with open("'$GRID'") as f:
+with open("'${TMPGRID}'") as f:
 	for line in f:
 		grid+=[line.split()]
 
@@ -70,11 +78,14 @@ for g in grid:
 		angles += [degrees(c)]
 	rank=int(('$NSTATMINGRID'-1)*'$SAFETYRATIO')
 	treshold='$NSTATMINGRID'
-	if sort(angles)[rank] > '$TELEDIST':
+	if sort(angles)[rank] >= '$TELEDIST' and '${INCLUDETELE}':
 		rank=int(('$TELERANK'-1)*'$SAFETYRATIO')
 		treshold='$TELERANK'
-	print g[0],g[1],g[2],g[3],around(sort(angles)[rank], decimals=3),treshold
+		print g[0],g[1],g[2],g[3],around(sort(angles)[rank], decimals=3),treshold
+	elif sort(angles)[rank] < '$TELEDIST':
+		print g[0],g[1],g[2],g[3],around(sort(angles)[rank], decimals=3),treshold
 '
 }
 
-nthhaversine
+nthhaversine $GRID True
+nthhaversine $DENSEGRIDFILE False

@@ -30,6 +30,12 @@ Setup the following in `.seiscomp3/scautoloc.cfg` to use the new grid:
 autoloc.grid = @SYSTEMCONFIGDIR@/grid-autotune.conf
 ```
 
+To  have the  grid plotted on scolv GUI do:
+```bash
+MYGRID=${SEISCOMP_ROOT}/share/scautoloc/grid.conf
+awk '{print $3}'  ${MYGRID}|sort -u|while read D; do mkdir -p ~/.seiscomp3/bna/grid/${D} ; awk '$3~/'$D'/{NL=NL+1;{if($2>180) $2=$2-360} printf "\"%d\",\"grid point %d %.1f km deep\", 1\n",NL,NL,'$D' ;printf "%s,%s\n",$2,$1}'  ${MYGRID}/share/scautoloc/grid.conf >  ~/.seiscomp3/bna/grid/${D}/grid.bna;done
+```
+
 ## Next?
 Next features, still missing, yet to be developed:
 1. Safer output only if all `scquery`, `curl`, and `fdsnws` requests are successful, return an error before writing outputs otherwise (will require one more optional command argument).
