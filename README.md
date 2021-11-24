@@ -39,6 +39,5 @@ awk '{print $3}'  ${MYGRID}|sort -u|while read D; do mkdir -p ~/.seiscomp3/bna/g
 ## Next?
 Next features, still missing, yet to be developed:
 1. Safer output only if all `scquery`, `curl`, and `fdsnws` requests are successful, return an error before writing outputs otherwise (will require one more optional command argument).
-2. Automatic densification of the default grid as a function of the density of active stations.
-3. Customise queries for database suffix.
-4. You name it.
+2. Customise queries for database suffix.
+3. You name it.
